@@ -1,0 +1,8 @@
+FROM openjdk:21-jdk
+
+WORKDIR /app
+COPY app/pom.xml .
+COPY app/ ./
+
+RUN mvn package
+CMD ["java", "-jar", "target/app.jar"]
