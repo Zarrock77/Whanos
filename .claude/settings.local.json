@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/jj/Documents/Projects/Whanos -type f -name *.md -o -name *.txt -o -name README*)",
+      "Bash(xargs ls:*)",
+      "Bash(find /c/Users/jj/Documents/Projects/Whanos -not -path .git* -type f)"
+    ]
+  }
+}
