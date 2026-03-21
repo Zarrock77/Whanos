@@ -1,0 +1,7 @@
+FROM esolang/befunge93:latest
+
+WORKDIR /app
+COPY main.bf ./
+EXPOSE 8080
+
+CMD ["befunge93", "main.bf"]
