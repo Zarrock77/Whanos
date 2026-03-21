@@ -1,0 +1,33 @@
+security:
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: false
+
+jenkins:
+  systemMessage: "Jenkins is running"
+  remotingSecurity:
+    enabled: true
+  securityRealm:
+    local:
+      allowSignup: false
+      users:
+        - name: "Admin"
+          id: "admin"
+          password: ${JENKINS_ADMIN_PASSWORD}
+  authorizationStrategy:
+    roleBased:
+      roles:
+        global:
+          - name: "Admin"
+            description: "Whanos master"
+            permissions:
+              - "Overall/Administer"
+            assignments:
+              - "admin"
+              - "jj"
+              - "wast"
+              - "ak"
+
+jobs:
+  - file: "jenkins/jobs.groovy"
+
+
