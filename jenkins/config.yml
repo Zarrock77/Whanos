@@ -29,5 +29,3 @@ jenkins:
 
 jobs:
   - file: "jenkins/jobs.groovy"
-
-
