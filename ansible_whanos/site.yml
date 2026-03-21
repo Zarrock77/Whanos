@@ -1,0 +1,9 @@
+# site.yml
+- name: Deploy Whanos Infrastructure
+  hosts: all
+  become: true
+  roles:
+    - docker
+    - jenkins
+    - kubernetes
+    - whanos

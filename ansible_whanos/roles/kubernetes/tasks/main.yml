@@ -1,0 +1,13 @@
+- name: Install Kubernetes dependencies
+  apt:
+    name: ["kubeadm", "kubectl", "kubelet"]
+    state: present
+
+- name: Initialize Kubernetes cluster
+  command: kubeadm init
+
+- name: Copy kubeconfig to user
+  command: cp /etc/kubernetes/admin.conf /home/{{ ansible_user }}/.kube/config
+
+- name: Apply network plugin
+  command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
