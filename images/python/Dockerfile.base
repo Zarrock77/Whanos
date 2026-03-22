@@ -1,8 +1,8 @@
 FROM python:3.12
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
-COPY app/requirements.txt .
-COPY app/ ./
+ONBUILD COPY . .
+ONBUILD RUN pip install -r requirements.txt
 
-RUN pip install -r requirements.txt
 CMD ["python", "-m", "app"]

@@ -1,8 +1,8 @@
-FROM openjdk:21-jdk
+FROM maven:3.8.6-openjdk-21
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
-COPY app/pom.xml .
-COPY app/ ./
+ONBUILD COPY . .
+ONBUILD RUN mvn package -q && cp target/*.jar app.jar && rm -rf target src pom.xml
 
-RUN mvn package
-CMD ["java", "-jar", "target/app.jar"]
+CMD ["java", "-jar", "app.jar"]

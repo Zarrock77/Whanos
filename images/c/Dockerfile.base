@@ -1,8 +1,8 @@
 FROM gcc:13.2
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
-COPY app/Makefile .
-COPY app/ ./
+ONBUILD COPY . .
+ONBUILD RUN make && rm -f *.c *.h Makefile
 
-RUN make
 CMD ["./compiled-app"]

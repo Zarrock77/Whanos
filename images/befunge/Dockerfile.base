@@ -1,6 +1,7 @@
 FROM esolang/befunge93
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
-COPY app/main.bf .
+ONBUILD COPY . .
 
-CMD ["befunge", "main.bf"]
+CMD ["befunge93", "main.bf"]
