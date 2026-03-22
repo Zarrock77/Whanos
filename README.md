@@ -79,7 +79,19 @@ docker build -f images/c/Dockerfile.standalone -t my-c-app app/c-hello-world/
 
 ## Deploying to Kubernetes
 
-To trigger automatic Kubernetes deployment, add a `whanos.yml` file at the root of your repository:
+By default, Jenkins only builds and pushes the Docker image. To **also deploy your app to Kubernetes**, add a `whanos.yml` file at the root of your repository. If this file is absent, no deployment happens.
+
+### Minimal example
+
+Just expose a port — 1 replica, no resource limits:
+
+```yaml
+deployment:
+  ports:
+    - 3000
+```
+
+### Full example
 
 ```yaml
 deployment:
@@ -91,13 +103,18 @@ deployment:
       memory: "64M"
   ports:
     - 3000
+    - 8080
 ```
 
-| Field      | Description                                      | Default |
-|------------|--------------------------------------------------|---------|
-| `replicas` | Number of pod replicas                           | 1       |
-| `resources`| Kubernetes resource spec (limits/requests)       | —       |
-| `ports`    | List of ports to expose outside the cluster      | —       |
+### Configuration reference
+
+| Field      | Required | Description                                      | Default |
+|------------|----------|--------------------------------------------------|---------|
+| `replicas` | No       | Number of pod replicas                           | 1       |
+| `resources`| No       | Kubernetes resource spec (limits/requests)       | —       |
+| `ports`    | No       | List of ports accessible from outside the cluster| —       |
+
+All fields are optional. The only requirement is the `deployment` key — its presence is what triggers the Kubernetes deployment.
 
 Kubernetes manifest templates are in the `kubernetes/` directory.
 
