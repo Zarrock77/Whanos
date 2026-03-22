@@ -1,0 +1,8 @@
+FROM rust:1.75
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /app
+COPY . .
+RUN cargo build --release && cp target/release/app ./compiled-app && rm -rf src target Cargo.toml Cargo.lock
+
+CMD ["./compiled-app"]

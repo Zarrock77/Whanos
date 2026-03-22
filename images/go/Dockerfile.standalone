@@ -1,0 +1,8 @@
+FROM golang:1.22
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /app
+COPY . .
+RUN go build -o compiled-app ./app && find . -name "*.go" -delete && rm -f go.mod go.sum
+
+CMD ["./compiled-app"]

@@ -1,0 +1,10 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /app
+COPY app/app.csproj app/
+RUN dotnet restore app/
+COPY . .
+RUN dotnet publish app/ -c Release -o /app/out && rm -rf app/
+
+CMD ["dotnet", "/app/out/app.dll"]

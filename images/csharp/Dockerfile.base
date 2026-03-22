@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /app
+ONBUILD COPY . .
+ONBUILD RUN dotnet publish app/ -c Release -o /app/out && rm -rf app/
+
+CMD ["dotnet", "/app/out/app.dll"]

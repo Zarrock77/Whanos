@@ -1,0 +1,8 @@
+FROM ruby:3.3
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /app
+ONBUILD COPY . .
+ONBUILD RUN bundle install
+
+CMD ["ruby", "app/main.rb"]
