@@ -7,7 +7,7 @@ available_languages = ['c', 'java', 'javascript', 'python', 'befunge']
 for (language in available_languages) {
     freeStyleJob("Whanos base images/whanos-${language}") {
         steps {
-            shell("docker build /images/${language} -f /images/${language}/Dockerfile.base -t whanos/${language}:latest")
+            shell("docker build -t whanos-${language}:latest - < /images/${language}/Dockerfile.base")
         }
     }
 }
@@ -32,12 +32,12 @@ freeStyleJob("link-project") {
 
     steps {
         dsl {
-            text('''
-                freeStyleJob("Projects/$PROJECT_NAME") {
+            text("""\
+                freeStyleJob("Projects/\${PROJECT_NAME}") {
                     scm {
                         git {
                             remote {
-                                url('$REPOSITORY_URL')
+                                url('\${GIT_REPOSITORY_URL}')
                             }
                         }
                     }
@@ -48,43 +48,45 @@ freeStyleJob("link-project") {
                         preBuildCleanup()
                     }
                     steps {
-                        shell("""
-                             if [ -f Dockerfile ]; then
+                        shell('''
+                            if [ -f Dockerfile ]; then
                                 echo "Custom Dockerfile detected - Using it directly"
-                                docker build -t "$PROJECT_NAME" .
+                                docker build -t "\$PROJECT_NAME" .
                             else
-                                # Détection du langage
                                 if [ -f Makefile ]; then
                                     echo "C project detected"
-                                    cp /images/c/Dockerfile.template Dockerfile
-                                    docker build -t "$PROJECT_NAME" .
-                                elif [ -f pom.xml ]; then
+                                    cp /images/c/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f app/pom.xml ]; then
                                     echo "Java project detected"
-                                    cp /images/java/Dockerfile.template Dockerfile
-                                    docker build -t "$PROJECT_NAME" .
+                                    cp /images/java/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
                                 elif [ -f package.json ]; then
                                     echo "JavaScript project detected"
-                                    cp /images/javascript/Dockerfile.template Dockerfile
-                                    docker build -t "$PROJECT_NAME" .
+                                    cp /images/javascript/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
                                 elif [ -f requirements.txt ]; then
                                     echo "Python project detected"
-                                    cp /images/python/Dockerfile.template Dockerfile
-                                    docker build -t "$PROJECT_NAME" .
-                                elif [ -f *.bf ]; then
+                                    cp /images/python/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f app/main.bf ]; then
                                     echo "Befunge project detected"
-                                    cp /images/befunge/Dockerfile.template Dockerfile
-                                    docker build -t "$PROJECT_NAME" .
+                                    cp /images/befunge/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
                                 fi
                             fi
 
-                            if [ -f kubernetes.yaml ]; then
-                                echo "Kubernetes configuration detected - Deploying"
-                                kubectl apply -f kubernetes.yaml
+                            docker push "\$PROJECT_NAME"
+
+                            if [ -f whanos.yml ]; then
+                                echo "whanos.yml detected - Deploying to Kubernetes"
+                                kubectl apply -f /kubernetes/deployment.yml
+                                kubectl apply -f /kubernetes/service.yml
                             fi
-                        """)
+                        ''')
                     }
                 }
-            '''.stripIndent())
+            """.stripIndent())
         }
     }
 }
