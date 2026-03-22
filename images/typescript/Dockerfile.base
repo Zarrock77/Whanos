@@ -1,0 +1,8 @@
+FROM node:20.9
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /app
+ONBUILD COPY . .
+ONBUILD RUN npm install && npm install -g typescript && tsc && find . -name "*.ts" -type f -not -path "./node_modules/*" -delete
+
+CMD ["node", "."]
