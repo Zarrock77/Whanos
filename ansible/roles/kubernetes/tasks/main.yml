@@ -4,10 +4,26 @@
     state: present
 
 - name: Initialize Kubernetes cluster
-  command: kubeadm init
+  command: kubeadm init --pod-network-cidr=192.168.0.0/16
+
+- name: Create .kube directory
+  file:
+    path: "/home/{{ ansible_user }}/.kube"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
 
 - name: Copy kubeconfig to user
-  command: cp /etc/kubernetes/admin.conf /home/{{ ansible_user }}/.kube/config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "/home/{{ ansible_user }}/.kube/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"
+    remote_src: true
 
 - name: Apply network plugin
   command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"

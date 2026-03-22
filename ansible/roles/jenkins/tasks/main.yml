@@ -3,6 +3,11 @@
     name: openjdk-11-jdk
     state: present
 
+- name: Add Jenkins GPG key
+  apt_key:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    state: present
+
 - name: Add Jenkins repository
   apt_repository:
     repo: "deb http://pkg.jenkins.io/debian-stable binary/"
@@ -19,20 +24,50 @@
     state: started
     enabled: true
 
-- name: Configure Jenkins admin user
+- name: Wait for Jenkins to start
+  uri:
+    url: "http://localhost:8080/login"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 30
+  delay: 5
+
+- name: Install Jenkins plugins
+  jenkins_plugin:
+    name: "{{ item }}"
+    state: present
+    url: "http://localhost:8080"
+  loop:
+    - job-dsl
+    - git
+    - role-strategy
+    - configuration-as-code
+    - ws-cleanup
+
+- name: Deploy JCasC configuration
   copy:
-    dest: /var/lib/jenkins/config.xml
-    content: |
-      <jenkins>
-        <securityRealm>
-          <hudson.security.HudsonPrivateSecurityRealm>
-            <disableSignup>true</disableSignup>
-            <users>
-              <user>
-                <id>Admin</id>
-                <password>password</password>
-              </user>
-            </users>
-          </hudson.security.HudsonPrivateSecurityRealm>
-        </securityRealm>
-      </jenkins>
+    src: "{{ playbook_dir }}/../jenkins/config.yml"
+    dest: /var/lib/jenkins/jenkins.yaml
+    owner: jenkins
+    group: jenkins
+    mode: "0644"
+
+- name: Deploy Job DSL script
+  copy:
+    src: "{{ playbook_dir }}/../jenkins/jobs.groovy"
+    dest: /var/lib/jenkins/jobs.groovy
+    owner: jenkins
+    group: jenkins
+    mode: "0644"
+
+- name: Set CASC_JENKINS_CONFIG environment variable
+  lineinfile:
+    path: /etc/default/jenkins
+    regexp: '^CASC_JENKINS_CONFIG='
+    line: 'CASC_JENKINS_CONFIG=/var/lib/jenkins/jenkins.yaml'
+
+- name: Restart Jenkins to apply configuration
+  service:
+    name: jenkins
+    state: restarted

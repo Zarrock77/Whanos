@@ -1,24 +1,8 @@
-- name: Deploy Base Images
-  docker_image:
-    name: "whanos-base"
-    tag: "latest"
-    source: build
-    path: "{{ playbook_dir }}/docker-images/base"
-
-- name: Deploy Standalone Images
-  docker_image:
-    name: "whanos-standalone"
-    tag: "latest"
-    source: build
-    path: "{{ playbook_dir }}/docker-images/standalone"
-
-- name: Deploy Kubernetes cluster
-  kubernetes:
-    state: present
-    definition:
-      replicas: 2
-      containers:
-        - name: whanos-app
-          image: "whanos-base:latest"
-          ports:
-            - containerPort: 80
+- name: Build base images
+  shell: "docker build -t whanos-{{ item }}:latest - < {{ playbook_dir }}/../images/{{ item }}/Dockerfile.base"
+  loop:
+    - c
+    - java
+    - javascript
+    - python
+    - befunge
