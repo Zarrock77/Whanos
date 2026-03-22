@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Whanos is an Epitech DevOps project that sets up an infrastructure to automatically deploy applications into a Kubernetes cluster on a Git push. It combines Docker, Jenkins, Ansible, and Kubernetes to provide a complete CI/CD pipeline supporting C, Java, JavaScript, Python, and Befunge.
+Whanos is an Epitech DevOps project that sets up an infrastructure to automatically deploy applications into a Kubernetes cluster on a Git push. It combines Docker, Jenkins, Ansible, and Kubernetes to provide a complete CI/CD pipeline supporting C, Java, JavaScript, Python, Befunge, TypeScript, Go, Rust, Ruby, PHP, and C#.
 
 **Pipeline flow:** Git push → Jenkins detects change → auto-detect language → containerize with Whanos image → push to Docker registry → deploy to Kubernetes (if `whanos.yml` present).
 
@@ -25,6 +25,12 @@ Two image types per language, in `images/<language>/`:
 | JavaScript | `package.json`        | `whanos-javascript`  | `node .`                |
 | Python     | `requirements.txt`    | `whanos-python`      | `python -m app`         |
 | Befunge    | `app/main.bf`         | `whanos-befunge`     | Free choice             |
+| TypeScript | `tsconfig.json`       | `whanos-typescript`  | `node .`                |
+| Go         | `go.mod`              | `whanos-go`          | `./compiled-app`        |
+| Rust       | `Cargo.toml`          | `whanos-rust`        | `./compiled-app`        |
+| Ruby       | `Gemfile`             | `whanos-ruby`        | `ruby app/main.rb`      |
+| PHP        | `composer.json`       | `whanos-php`         | `php -S 0.0.0.0:8080`   |
+| C#         | `app/app.csproj`      | `whanos-csharp`      | `dotnet app.dll`         |
 
 App source code lives in the `app/` directory of Whanos-compatible repositories.
 
@@ -93,4 +99,4 @@ docker build -t myapp -f images/c/Dockerfile.standalone .
 
 ## Example Apps (`app/`)
 
-Sample Whanos-compatible applications for testing: `c-hello-world`, `java-hello-world`, `js-hello-world`, `python-hello-world`, `ts-hello-world`, `befunge-hello-world`. The `ts-hello-world` includes a `whanos.yml` demonstrating Kubernetes deployment config.
+Sample Whanos-compatible applications for testing: `c-hello-world`, `java-hello-world`, `js-hello-world`, `python-hello-world`, `ts-hello-world`, `befunge-hello-world`, `go-hello-world`, `rust-hello-world`, `ruby-hello-world`, `php-hello-world`, `csharp-hello-world`. The `ts-hello-world` includes a `whanos.yml` demonstrating Kubernetes deployment config.

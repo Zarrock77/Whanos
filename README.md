@@ -1,6 +1,6 @@
 # Whanos
 
-Whanos is a DevOps infrastructure that automatically detects, containerizes, and deploys applications to a Kubernetes cluster on every Git push. It supports **C**, **Java**, **JavaScript**, **Python**, and **Befunge**.
+Whanos is a DevOps infrastructure that automatically detects, containerizes, and deploys applications to a Kubernetes cluster on every Git push. It supports **C**, **Java**, **JavaScript**, **Python**, **Befunge**, **TypeScript**, **Go**, **Rust**, **Ruby**, **PHP**, and **C#**.
 
 **Pipeline flow:** `Git push → Jenkins detects change → auto-detect language → containerize → push to registry → deploy to Kubernetes`
 
@@ -39,6 +39,12 @@ Detection is **mutually exclusive** — a repository must match exactly one lang
 | JavaScript | `package.json`    | `node .`           |
 | Python     | `requirements.txt`| `python -m app`    |
 | Befunge    | `app/main.bf`     | `befunge93 main.bf`|
+| TypeScript | `tsconfig.json`   | `node .`           |
+| Go         | `go.mod`          | `./compiled-app`   |
+| Rust       | `Cargo.toml`      | `./compiled-app`   |
+| Ruby       | `Gemfile`         | `ruby app/main.rb` |
+| PHP        | `composer.json`   | `php -S 0.0.0.0:8080` |
+| C#         | `app/app.csproj`  | `dotnet app.dll`   |
 
 Application source code must live in the `app/` directory of Whanos-compatible repositories.
 
@@ -75,7 +81,7 @@ docker build -f images/c/Dockerfile.standalone -t my-c-app app/c-hello-world/
 
 - Base images must build without any app code available
 - All images use `/bin/bash` as their shell
-- Compiled language images (C, Java) strip source files from the final image
+- Compiled language images (C, Java, TypeScript, Go, Rust, C#) strip source files from the final image
 
 ## Deploying to Kubernetes
 
@@ -195,7 +201,12 @@ whanos/
     ├── js-hello-world/
     ├── python-hello-world/
     ├── befunge-hello-world/
-    └── ts-hello-world/           # Includes whanos.yml + custom Dockerfile
+    ├── ts-hello-world/           # Includes whanos.yml for K8s deployment
+    ├── go-hello-world/
+    ├── rust-hello-world/
+    ├── ruby-hello-world/
+    ├── php-hello-world/
+    └── csharp-hello-world/
 ```
 
 ## CI Pipeline
@@ -204,8 +215,8 @@ The GitHub Actions workflow validates the entire project on every push:
 
 | Job                     | What it tests                                              |
 |-------------------------|------------------------------------------------------------|
-| **Base images** (x5)   | Each base Dockerfile builds without app code               |
-| **Standalone** (x5)    | Build with example apps + verify container output          |
+| **Base images** (x11)  | Each base Dockerfile builds without app code               |
+| **Standalone** (x11)   | Build with example apps + verify container output          |
 | **Ansible**             | `ansible-playbook --syntax-check` + `ansible-lint`         |
 | **Kubernetes**          | Manifest validation with `kubeconform`                     |
 | **Jenkins**             | JCasC YAML validation + Groovy syntax check                |
@@ -219,9 +230,12 @@ The GitHub Actions workflow validates the entire project on every push:
 | `js-hello-world`     | JavaScript | Server | Express on port 3000       |
 | `python-hello-world` | Python     | Server | Flask on port 8080         |
 | `befunge-hello-world`| Befunge    | CLI    | `Hello World!`             |
-| `ts-hello-world`     | TypeScript | Server | Express on port 3000 (custom Dockerfile + `whanos.yml`) |
-
-The `ts-hello-world` app demonstrates the full pipeline with a custom Dockerfile and Kubernetes deployment configuration.
+| `ts-hello-world`     | TypeScript | Server | Express on port 3000 (`whanos.yml` for K8s deployment) |
+| `go-hello-world`     | Go         | CLI    | `Hello World!`             |
+| `rust-hello-world`   | Rust       | CLI    | `Hello World!`             |
+| `ruby-hello-world`   | Ruby       | CLI    | `Hello World!`             |
+| `php-hello-world`    | PHP        | Server | PHP built-in server on 8080|
+| `csharp-hello-world` | C#         | CLI    | `Hello World!`             |
 
 ## License
 
