@@ -143,7 +143,7 @@ Jenkins will create a new job that polls the repository every minute and trigger
 
 ### Admin Users
 
-`admin`, `jj`, `wast`, `ak` — sign-up is disabled.
+A single `admin` account is created. Sign-up is disabled. The password is set via the `JENKINS_ADMIN_PASSWORD` environment variable.
 
 ## Project Structure
 

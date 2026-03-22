@@ -30,7 +30,7 @@ App source code lives in the `app/` directory of Whanos-compatible repositories.
 
 ### Jenkins (`jenkins/`)
 
-- `config.yml` — Jenkins Configuration as Code (JCasC). RBAC with admin users: admin, jj, wast, ak. Sign-up disabled.
+- `config.yml` — Jenkins Configuration as Code (JCasC). RBAC with a single admin user. Sign-up disabled.
 - `jobs.groovy` — Job DSL script defining:
   - **"Whanos base images"** folder with per-language build jobs + "Build all base images" trigger
   - **"Projects"** folder for linked project jobs

@@ -23,9 +23,6 @@ jenkins:
               - "Overall/Administer"
             assignments:
               - "admin"
-              - "jj"
-              - "wast"
-              - "ak"
 
 jobs:
   - file: "jenkins/jobs.groovy"
