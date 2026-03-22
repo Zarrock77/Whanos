@@ -2,9 +2,7 @@ FROM maven:3.8.6-openjdk-21
 SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
-COPY pom.xml ./
-RUN mvn dependency:go-offline
-COPY . .
+COPY app/ ./
 
-RUN mvn package -q && cp target/*.jar app.jar && rm -rf target src pom.xml
+RUN mvn package -q && mv target/app.jar ./app.jar && rm -rf target src pom.xml
 CMD ["java", "-jar", "app.jar"]

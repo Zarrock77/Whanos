@@ -2,6 +2,6 @@ FROM esolang/befunge93:latest
 SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
-COPY main.bf ./
+COPY app/main.bf ./
 
 CMD ["befunge93", "main.bf"]

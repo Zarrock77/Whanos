@@ -2,8 +2,7 @@ FROM gcc:13.2
 SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
-COPY Makefile ./
 COPY . .
 
-RUN make && rm -f *.c *.h Makefile
+RUN make && mv compiled-app /tmp/ && rm -rf * && mv /tmp/compiled-app .
 CMD ["./compiled-app"]
