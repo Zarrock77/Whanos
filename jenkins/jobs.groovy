@@ -2,7 +2,7 @@ folder("Whanos base images") {
 	description("The base images of whanos.")
 }
 
-available_languages = ['c', 'java', 'javascript', 'python', 'befunge']
+available_languages = ['c', 'java', 'javascript', 'python', 'befunge', 'typescript', 'go', 'rust', 'ruby', 'php', 'csharp']
 
 for (language in available_languages) {
     freeStyleJob("Whanos base images/whanos-${language}") {
@@ -60,6 +60,30 @@ freeStyleJob("link-project") {
                                 elif [ -f app/pom.xml ]; then
                                     echo "Java project detected"
                                     cp /images/java/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f app/app.csproj ]; then
+                                    echo "C# project detected"
+                                    cp /images/csharp/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f Cargo.toml ]; then
+                                    echo "Rust project detected"
+                                    cp /images/rust/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f go.mod ]; then
+                                    echo "Go project detected"
+                                    cp /images/go/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f Gemfile ]; then
+                                    echo "Ruby project detected"
+                                    cp /images/ruby/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f composer.json ]; then
+                                    echo "PHP project detected"
+                                    cp /images/php/Dockerfile.standalone Dockerfile
+                                    docker build -t "\$PROJECT_NAME" .
+                                elif [ -f tsconfig.json ]; then
+                                    echo "TypeScript project detected"
+                                    cp /images/typescript/Dockerfile.standalone Dockerfile
                                     docker build -t "\$PROJECT_NAME" .
                                 elif [ -f package.json ]; then
                                     echo "JavaScript project detected"
