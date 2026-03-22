@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [c, java, javascript, python, befunge]
+        language: [c, java, javascript, python, befunge, typescript, go, rust, ruby, php, csharp]
     steps:
       - uses: actions/checkout@v4
       - name: Build base image (must succeed without app code)
@@ -48,6 +48,30 @@ jobs:
             app: befunge-hello-world
             run_mode: oneshot
             expected: "Hello"
+          - language: typescript
+            app: ts-hello-world
+            run_mode: server
+            expected: "Listening on localhost:"
+          - language: go
+            app: go-hello-world
+            run_mode: oneshot
+            expected: "Hello World!"
+          - language: rust
+            app: rust-hello-world
+            run_mode: oneshot
+            expected: "Hello World!"
+          - language: ruby
+            app: ruby-hello-world
+            run_mode: oneshot
+            expected: "Hello World!"
+          - language: php
+            app: php-hello-world
+            run_mode: server
+            expected: "Development Server"
+          - language: csharp
+            app: csharp-hello-world
+            run_mode: oneshot
+            expected: "Hello World!"
     steps:
       - uses: actions/checkout@v4
 
