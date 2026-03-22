@@ -56,6 +56,10 @@ Roles executed in order:
 
 Template manifests for deployed apps: `deployment.yml`, `service.yml` (LoadBalancer), `namespace.yml`, `configmap.yml`, `secret.yml`, `ingress.yml`.
 
+### Deploy Script (`scripts/`)
+
+`deploy.py` reads `whanos.yml`, generates Kubernetes manifests dynamically, and applies them via `kubectl`. Generates: Namespace, Deployment, Service, Ingress (optional), HPA (optional).
+
 ### whanos.yml spec
 
 When present at repo root with a `deployment` key, triggers Kubernetes deployment:
@@ -69,6 +73,19 @@ deployment:
       memory: "64M"
   ports:               # integer list, forwarded and externally accessible
     - 3000
+  env:                 # environment variables injected into pods
+    NODE_ENV: production
+  health_check:        # HTTP liveness/readiness probes
+    path: /health
+    port: 3000
+    initial_delay: 10
+    period: 30
+  autoscale:           # HorizontalPodAutoscaler
+    min: 2
+    max: 10
+    cpu_target: 70
+  ingress:             # Ingress rule
+    host: myapp.example.com
 ```
 
 ## Commands

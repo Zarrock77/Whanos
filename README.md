@@ -105,24 +105,49 @@ deployment:
   resources:
     limits:
       memory: "128M"
+      cpu: "500m"
     requests:
       memory: "64M"
+      cpu: "250m"
   ports:
     - 3000
     - 8080
+  env:
+    NODE_ENV: production
+    DB_HOST: postgres.default.svc
+  health_check:
+    path: /health
+    port: 3000
+    initial_delay: 10
+    period: 30
+  autoscale:
+    min: 2
+    max: 10
+    cpu_target: 70
+  ingress:
+    host: myapp.example.com
 ```
 
 ### Configuration reference
 
-| Field      | Required | Description                                      | Default |
-|------------|----------|--------------------------------------------------|---------|
-| `replicas` | No       | Number of pod replicas                           | 1       |
-| `resources`| No       | Kubernetes resource spec (limits/requests)       | —       |
-| `ports`    | No       | List of ports accessible from outside the cluster| —       |
+| Field                       | Required | Description                                       | Default     |
+|-----------------------------|----------|---------------------------------------------------|-------------|
+| `replicas`                  | No       | Number of pod replicas                             | 1           |
+| `resources`                 | No       | Kubernetes resource spec (limits/requests)         | —           |
+| `ports`                     | No       | List of ports accessible from outside the cluster  | —           |
+| `env`                       | No       | Environment variables as key-value pairs           | —           |
+| `health_check.path`         | No       | HTTP path for liveness/readiness probes            | `/health`   |
+| `health_check.port`         | No       | Port for health check probes                       | First port  |
+| `health_check.initial_delay`| No       | Seconds before first probe                         | 10          |
+| `health_check.period`       | No       | Seconds between probes                             | 30          |
+| `autoscale.min`             | No       | Minimum replicas for HPA                           | 1           |
+| `autoscale.max`             | No       | Maximum replicas for HPA                           | 10          |
+| `autoscale.cpu_target`      | No       | Target CPU utilization percentage for scaling      | 70          |
+| `ingress.host`              | No       | Hostname for Ingress rule                          | `<project>.local` |
 
 All fields are optional. The only requirement is the `deployment` key — its presence is what triggers the Kubernetes deployment.
 
-Kubernetes manifest templates are in the `kubernetes/` directory.
+Manifests are generated dynamically by `scripts/deploy.py` based on the `whanos.yml` configuration. Static templates in `kubernetes/` serve as reference examples.
 
 ## Infrastructure Setup
 
