@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Docker Base Images ──────────────────────────────────────────────
+  docker-base-images:
+    name: "Base image: ${{ matrix.language }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [c, java, javascript, python, befunge]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build base image (must succeed without app code)
+        run: docker build -t whanos-${{ matrix.language }} - < images/${{ matrix.language }}/Dockerfile.base
+
+  # ── Docker Standalone Images ────────────────────────────────────────
+  docker-standalone-images:
+    name: "Standalone: ${{ matrix.language }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: c
+            app: c-hello-world
+            run_mode: oneshot
+            expected: "Hello world!"
+          - language: java
+            app: java-hello-world
+            run_mode: oneshot
+            expected: "Hello World!"
+          - language: javascript
+            app: js-hello-world
+            run_mode: server
+            expected: "Listening on localhost:"
+          - language: python
+            app: python-hello-world
+            run_mode: server
+            expected: "Running on"
+          - language: befunge
+            app: befunge-hello-world
+            run_mode: oneshot
+            expected: "Hello"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build standalone image
+        run: docker build -f images/${{ matrix.language }}/Dockerfile.standalone -t test-${{ matrix.language }} app/${{ matrix.app }}/
+
+      - name: Test container (oneshot)
+        if: matrix.run_mode == 'oneshot'
+        run: |
+          OUTPUT=$(docker run --rm test-${{ matrix.language }})
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "${{ matrix.expected }}"
+
+      - name: Test container (server)
+        if: matrix.run_mode == 'server'
+        run: |
+          docker run -d --name test-${{ matrix.language }} test-${{ matrix.language }}
+          sleep 5
+          OUTPUT=$(docker logs test-${{ matrix.language }})
+          echo "$OUTPUT"
+          docker stop test-${{ matrix.language }}
+          echo "$OUTPUT" | grep -q "${{ matrix.expected }}"
+
+  # ── Ansible Validation ─────────────────────────────────────────────
+  ansible-lint:
+    name: Ansible syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Ansible
+        run: pip install ansible ansible-lint
+      - name: Syntax check
+        run: ansible-playbook --syntax-check ansible/site.yml
+      - name: Ansible Lint
+        run: ansible-lint ansible/ || true
+
+  # ── Kubernetes Manifests ───────────────────────────────────────────
+  kubernetes-validate:
+    name: Kubernetes manifest validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate deployment.yml
+        run: kubectl apply --dry-run=client -f kubernetes/deployment.yml
+      - name: Validate service.yml
+        run: kubectl apply --dry-run=client -f kubernetes/service.yml
+
+  # ── Jenkins Groovy Syntax ──────────────────────────────────────────
+  jenkins-validate:
+    name: Jenkins config validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JCasC YAML syntax
+        run: python -c "import yaml; yaml.safe_load(open('jenkins/config.yml'))"
+      - name: Validate Groovy syntax
+        run: |
+          docker run --rm -v "$PWD/jenkins:/jenkins" groovy:latest groovy -e "
+            new GroovyShell().parse(new File('/jenkins/jobs.groovy'))
+            println 'Groovy syntax OK'
+          "
