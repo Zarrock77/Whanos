@@ -104,8 +104,7 @@ freeStyleJob("link-project") {
 
                             if [ -f whanos.yml ]; then
                                 echo "whanos.yml detected - Deploying to Kubernetes"
-                                kubectl apply -f /kubernetes/deployment.yml
-                                kubectl apply -f /kubernetes/service.yml
+                                python3 /scripts/deploy.py "\$PROJECT_NAME" "\$PROJECT_NAME:latest"
                             fi
                         ''')
                     }

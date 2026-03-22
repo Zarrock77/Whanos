@@ -1,6 +1,9 @@
 - name: Install Jenkins dependencies
   apt:
-    name: openjdk-11-jdk
+    name:
+      - openjdk-11-jdk
+      - python3
+      - python3-yaml
     state: present
 
 - name: Add Jenkins GPG key
@@ -60,6 +63,14 @@
     owner: jenkins
     group: jenkins
     mode: "0644"
+
+- name: Deploy Whanos deploy script
+  copy:
+    src: "{{ playbook_dir }}/../scripts/deploy.py"
+    dest: /scripts/deploy.py
+    owner: jenkins
+    group: jenkins
+    mode: "0755"
 
 - name: Set CASC_JENKINS_CONFIG environment variable
   lineinfile:
