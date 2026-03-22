@@ -1,9 +1,9 @@
 FROM gcc:13.2
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
 COPY Makefile ./
 COPY . .
 
-RUN make
-EXPOSE 8080
+RUN make && rm -f *.c *.h Makefile
 CMD ["./compiled-app"]

@@ -1,7 +1,7 @@
 FROM esolang/befunge93:latest
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app
 COPY main.bf ./
-EXPOSE 8080
 
 CMD ["befunge93", "main.bf"]
