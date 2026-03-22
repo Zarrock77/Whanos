@@ -122,6 +122,21 @@ jobs:
       - name: Validate manifests
         run: kubeconform -strict kubernetes/deployment.yml kubernetes/service.yml kubernetes/namespace.yml kubernetes/configmap.yml kubernetes/secret.yml kubernetes/ingress.yml
 
+  # ── Deploy Script Validation ──────────────────────────────────────
+  deploy-script-validate:
+    name: Deploy script validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Syntax check
+        run: python3 -c "import py_compile; py_compile.compile('scripts/deploy.py', doraise=True)"
+      - name: Test manifest generation with ts-hello-world
+        run: |
+          cd app/ts-hello-world
+          python3 ../../scripts/deploy.py test-project test-image:latest --dry-run
+
   # ── Jenkins Groovy Syntax ──────────────────────────────────────────
   jenkins-validate:
     name: Jenkins config validation
