@@ -7,3 +7,10 @@ deployment:
       memory: "64M"
   ports:
     - 3000
+  env:
+    NODE_ENV: production
+  health_check:
+    path: /health
+    port: 3000
+  ingress:
+    host: ts-hello-world.whanos.local
