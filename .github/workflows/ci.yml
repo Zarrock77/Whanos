@@ -96,7 +96,7 @@ jobs:
           tar xf kubeconform-linux-amd64.tar.gz
           sudo mv kubeconform /usr/local/bin/
       - name: Validate manifests
-        run: kubeconform -strict kubernetes/deployment.yml kubernetes/service.yml
+        run: kubeconform -strict kubernetes/deployment.yml kubernetes/service.yml kubernetes/namespace.yml kubernetes/configmap.yml kubernetes/secret.yml kubernetes/ingress.yml
 
   # ── Jenkins Groovy Syntax ──────────────────────────────────────────
   jenkins-validate:
