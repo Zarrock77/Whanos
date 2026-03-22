@@ -69,7 +69,7 @@ jobs:
           OUTPUT=$(docker logs test-${{ matrix.language }})
           echo "$OUTPUT"
           docker stop test-${{ matrix.language }}
-          echo "$OUTPUT" | grep -q "${{ matrix.expected }}"
+          echo "$OUTPUT" | grep -qF "${{ matrix.expected }}"
 
   # ── Ansible Validation ─────────────────────────────────────────────
   ansible-lint:
@@ -90,10 +90,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate deployment.yml
-        run: kubectl apply --dry-run=client -f kubernetes/deployment.yml
-      - name: Validate service.yml
-        run: kubectl apply --dry-run=client -f kubernetes/service.yml
+      - name: Install kubeval
+        run: |
+          wget -q https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+          sudo mv kubeval /usr/local/bin/
+      - name: Validate manifests
+        run: kubeval kubernetes/deployment.yml kubernetes/service.yml
 
   # ── Jenkins Groovy Syntax ──────────────────────────────────────────
   jenkins-validate:
